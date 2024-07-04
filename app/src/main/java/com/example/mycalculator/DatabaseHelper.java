@@ -71,26 +71,41 @@ public int updateData(String name, String email, String homePhone, String office
          }
      }
 //show all data
-     public List<String> getAllContacts() {
-        List<String> contacts = new ArrayList<>();
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(COL_2));
-                @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(COL_3));
-                @SuppressLint("Range") String phoneHome = cursor.getString(cursor.getColumnIndex(COL_4));
-                @SuppressLint("Range") String phoneOffice = cursor.getString(cursor.getColumnIndex(COL_5));
-                contacts.add("Name: " + name + "\nEmail: " + email + "\nHome Phone: " + phoneHome + "\nOffice Phone: " + phoneOffice);
-            } while (cursor.moveToNext());
-        } else {
-            contacts.add("No Contact Saved");
-        }
-        cursor.close();
-        db.close();
-        return contacts;
+public List<String> getAllContacts() {
+    List<String> contacts = new ArrayList<>();
+    SQLiteDatabase db = this.getWritableDatabase();
+    Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    if (cursor.moveToFirst()) {
+        do {
+            @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(COL_2));
+            @SuppressLint("Range") String phoneHome = cursor.getString(cursor.getColumnIndex(COL_4));
+            contacts.add("Name: " + name + "\nHome Phone: " + phoneHome);
+        } while (cursor.moveToNext());
+    } else {
+        contacts.add("No Contact Saved");
     }
-//delete
+    cursor.close();
+    db.close();
+    return contacts;
+}
+
+     public String getContactDetails(String phoneHome) {
+         SQLiteDatabase db = this.getWritableDatabase();
+         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_4 + " = ?", new String[]{phoneHome});
+         if (cursor.moveToFirst()) {
+             @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(COL_2));
+             @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(COL_3));
+             @SuppressLint("Range") String officePhone = cursor.getString(cursor.getColumnIndex(COL_5));
+             cursor.close();
+             db.close();
+             return "Name: " + name + "\nEmail: " + email + "\nHome Phone: " + phoneHome + "\nOffice Phone: " + officePhone;
+         }
+         cursor.close();
+         db.close();
+         return null;
+     }
+
+     //delete
      public int deleteData(String homePhone, String officePhone) {
          SQLiteDatabase db = this.getWritableDatabase();
          // Delete where the home phone or office phone matches the given phone number
